@@ -20,4 +20,7 @@ Charging operators and e-Mobility Service Providers can join the network with sm
 
 This allows for a smoother transition to a fully blockchain based solution and an undoubtedly easier adoption of other open protocols.
 
-    This is a work in progress concept
+![Architecture diagram](https://miro.medium.com/max/1200/1*32pHt-mDihAnRqf9wb7Uow.png)
+Source: *https://medium.com/share-charge/decentralizing-the-charging-business-for-the-emobility-industry-part-iii-5a1a2cb58129*
+
+    This is a work in progress concept using aeternity
