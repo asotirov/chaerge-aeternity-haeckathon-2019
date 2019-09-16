@@ -1,0 +1,36 @@
+contract WattContract =
+   record state = {
+         map_charge_points: map(address, charge_point),
+         transactions: list(transaction)}
+
+   record charge_point = {
+      url_backend: string,
+      watts_capacity: int,
+      schedule_deadline: int}
+
+   record transaction = {
+      charge_point_id: hash,
+      ev_connected: bool,
+      disconnect_deadline: int}
+
+   stateful entrypoint init() = {
+      map_charge_points = {},
+      transactions = []}
+
+   stateful entrypoint register_charge_point(url_backend: string, watts_capacity: int) : () =
+      require(!charge_point_exists(Call.caller), "CP exists!")      
+      require(Call.caller != Contract.creator, "Caller cannot be the creator")
+
+      let new_charge_point : charge_point = {
+         url_backend = url_backend,
+         watts_capacity = watts_capacity,
+         is_scheduled = false,
+         is_connected = false}
+
+      put(state{map_charge_points[Call.caller] = new_charge_point})
+   
+   function charge_point_exists(charge_point_id: address): bool =
+      Map.member(charge_point_id, state.map_charge_points)
+
+   entrypoint get_charge_point(charge_point_id: address): charge_point =
+      state.map_charge_points[charge_point_id]

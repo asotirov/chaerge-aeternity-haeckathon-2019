@@ -12,5 +12,8 @@
     "@aeternity/aepp-sdk": "4.5.0",
     "aeproject-lib": "1.0.0",
     "yarn": "1.17.3"
+  },
+  "engines": {
+    "node": "10.16.3"
   }
 }
