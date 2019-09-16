@@ -4,7 +4,8 @@
   "description": "This is the default package.json generated for your project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile_win": "aeproject compile --compiler http://192.168.99.100:3080"
   },
   "author": "",
   "license": "ISC",

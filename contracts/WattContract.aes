@@ -1,36 +1,58 @@
 contract WattContract =
-   record state = {
+    record state = {
          map_charge_points: map(address, charge_point),
-         transactions: list(transaction)}
+         map_transactions: map(address, transaction)}
 
-   record charge_point = {
-      url_backend: string,
-      watts_capacity: int,
-      schedule_deadline: int}
+    record charge_point = {
+        url_backend: string,
+        watts_capacity: int}
 
-   record transaction = {
-      charge_point_id: hash,
-      ev_connected: bool,
-      disconnect_deadline: int}
+    record transaction = {
+        ev_connected: bool}
 
-   stateful entrypoint init() = {
-      map_charge_points = {},
-      transactions = []}
+    stateful entrypoint init() = {
+        map_charge_points = {},
+        map_transactions = {}}
 
-   stateful entrypoint register_charge_point(url_backend: string, watts_capacity: int) : () =
-      require(!charge_point_exists(Call.caller), "CP exists!")      
-      require(Call.caller != Contract.creator, "Caller cannot be the creator")
+    // Chargepoints
 
-      let new_charge_point : charge_point = {
-         url_backend = url_backend,
-         watts_capacity = watts_capacity,
-         is_scheduled = false,
-         is_connected = false}
+    stateful entrypoint register_charge_point(url_backend: string, watts_capacity: int) : () =
+        require(!charge_point_exists(Call.caller), "CP exists!")      
+        require(Call.caller != Contract.creator, "Caller cannot be the creator")
 
-      put(state{map_charge_points[Call.caller] = new_charge_point})
+        let new_charge_point : charge_point = {
+            url_backend = url_backend,
+            watts_capacity = watts_capacity}
+
+        put(state{map_charge_points[Call.caller] = new_charge_point})
    
-   function charge_point_exists(charge_point_id: address): bool =
-      Map.member(charge_point_id, state.map_charge_points)
+    function get_charge_point_or_error(charge_point_id: address): charge_point =
+        require(charge_point_exists(charge_point_id), "CP doesn't exist!")      
+        state.map_charge_points[charge_point_id]
 
-   entrypoint get_charge_point(charge_point_id: address): charge_point =
-      state.map_charge_points[charge_point_id]
+    function charge_point_exists(charge_point_id: address): bool =
+        Map.member(charge_point_id, state.map_charge_points)
+
+    entrypoint get_charge_point(charge_point_id: address): charge_point =
+        get_charge_point_or_error(charge_point_id)
+    
+    // Transactions
+    entrypoint transaction_check(charge_point_id: address, watts_per_hour: int, schedule_period: int): transaction =
+        require(active_transaction_exists(charge_point_id), "Transaction at charging point doesn't exist")
+        state.map_transactions[charge_point_id]
+        
+    stateful entrypoint transaction_start(charge_point_id: address, watts_total: int, schedule_period: int): () =
+        require(!active_transaction_exists(charge_point_id), "Transaction already opened at charging point")      
+        
+        let charge_point = get_charge_point_or_error(charge_point_id)
+        require(charge_point.watts_capacity * schedule_period > watts_total, "Charge point capacity is not enough for requst")
+
+        let new_transaction : transaction = {
+            ev_connected = false}
+        put(state{map_transactions[charge_point_id] = new_transaction})
+
+    stateful entrypoint transaction_connect_ev(charge_point_id: address): () =
+        put(state{map_transactions[charge_point_id] = { ev_connected = true }})
+
+    function active_transaction_exists(charge_point_id: address): bool =
+        Map.member(charge_point_id, state.map_transactions)
