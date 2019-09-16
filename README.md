@@ -1,5 +1,5 @@
 ### Chaerge ###
-#### aeternity based charging operators settlement layer ###
+#### aeternity based channingrging operators settlement layer ###
 
 Electric vehicles are an essential part of keeping the world clean. However, there are insufficient business models within the charging stations industry.
 
@@ -24,3 +24,7 @@ This allows for a smoother transition to a fully blockchain based solution and a
 Source: *https://medium.com/share-charge/decentralizing-the-charging-business-for-the-emobility-industry-part-iii-5a1a2cb58129*
 
     This is a work in progress concept using aeternity
+
+todo:
+
+. CONTRACT: implement payments/settlement with charge operator address
